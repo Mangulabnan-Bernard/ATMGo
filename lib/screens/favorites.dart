@@ -24,7 +24,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   // Function to fetch the favorites from the API
   Future<void> _getFavorites() async {
     final response = await http.post(
-      Uri.parse('http://192.168.68.112/api_bank/api/get_favorites.php'), // Use your actual API URL
+      Uri.parse('https://atmgo.site/api/get_favorites.php'), // Use your actual API URL
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'user_id': widget.userId}), // Send user ID to get favorites
     );
