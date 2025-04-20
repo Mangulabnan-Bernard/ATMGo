@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('User ID received: $_userId'); // Debug print
         await _authenticate(); // Trigger PIN or Fingerprint authentication
       } else {
-        _showSnackBar('Invalid credentials');
+        _showSnackBar('Wrong user or password');
       }
     } catch (e) {
       _showSnackBar('Error: $e');
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Positioned.fill(
@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushNamed(context, '/register');
                       },
                       icon: Icon(Icons.app_registration),
-                      label: Text('Register'),
+                      label: Text('Open an Account'),
                     ),
                   ),
                 ],
