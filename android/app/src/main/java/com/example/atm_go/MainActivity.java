@@ -1,4 +1,4 @@
-package com.example.atmgo;
+package com.developer.atmgo;
 
 import io.flutter.embedding.android.FlutterFragmentActivity;
 
