@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           case '/dashboard':
             if (args is Map<String, dynamic>) {
               return MaterialPageRoute(builder: (_) => DashboardScreen(
-                userId: args['userId'], mobileNumber: '',
+                userId: args['userId'],
               ));
             }
             throw ArgumentError('DashboardScreen requires a valid user ID');

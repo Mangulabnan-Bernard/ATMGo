@@ -143,7 +143,8 @@ class _TransferScreenState extends State<TransferScreen> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  DashboardScreen(userId: widget.userId, mobileNumber: ''),
+                  DashboardScreen(
+                    userId: widget.userId,),
             ),
           );
         }

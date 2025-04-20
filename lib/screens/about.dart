@@ -29,8 +29,6 @@ class _AboutUsPageState extends State<AboutUsPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
                 ),
               ),
             ),
@@ -47,8 +45,6 @@ class _AboutUsPageState extends State<AboutUsPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
                 ),
               ),
             ),

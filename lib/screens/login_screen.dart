@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import '../services/api_service.dart';
+import 'register_screen.dart'; // Ensure the correct import for RegisterScreen
+import 'dashboard_screen.dart'; // Ensure the correct import for DashboardScreen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,60 +13,45 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   String _username = '', _password = '';
   final LocalAuthentication auth = LocalAuthentication();
-  bool _isBiometricAvailable = false;
-  String _biometricStatus = 'Checking...';
   bool _isLoading = false;
+  int? _userId; // Store the user ID
 
   @override
   void initState() {
     super.initState();
-    _checkBiometrics();
   }
 
-  Future<void> _checkBiometrics() async {
-    try {
-      final LocalAuthentication auth = LocalAuthentication();
-
-      bool canCheckBiometrics = await auth.canCheckBiometrics;
-      List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
-
-      print('Can check biometrics: $canCheckBiometrics');
-      print('Available biometrics: $availableBiometrics');
-
-      setState(() {
-        _isBiometricAvailable = canCheckBiometrics && availableBiometrics.isNotEmpty;
-        _biometricStatus = _isBiometricAvailable
-            ? 'Biometric available: $availableBiometrics'
-            : 'Biometric not available';
-      });
-    } catch (e) {
-      setState(() {
-        _biometricStatus = 'Error checking biometrics: $e';
-      });
-    }
-  }
-
-
-
-
-  Future<void> _authenticateWithBiometrics() async {
+  // Authenticate with PIN or Fingerprint
+  Future<void> _authenticate() async {
     setState(() {
       _isLoading = true;
     });
     try {
       bool authenticated = await auth.authenticate(
-        localizedReason: 'Scan your fingerprint to authenticate',
+        localizedReason: 'Authenticate to continue',
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: true,
         ),
       );
 
       if (authenticated) {
-        await _navigateToDashboard();
+        _showSnackBar('Process successful');
+        // Navigate to the dashboard or perform any other action
+        if (_userId != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DashboardScreen(userId: _userId!),
+            ),
+          );
+        } else {
+          _showSnackBar('User ID not available');
+        }
+      } else {
+        _showSnackBar('Authentication failed');
       }
     } catch (e) {
-      _showSnackBar('Biometric authentication failed: $e');
+      _showSnackBar('Authentication failed: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -72,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Login using Username and Password
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -80,7 +68,16 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await _navigateToDashboard();
+      final response = await ApiService.login(_username, _password);
+      if (response['message'] == 'Login successful') {
+        setState(() {
+          _userId = response['user_id']; // Store the user ID
+        });
+        print('User ID received: $_userId'); // Debug print
+        await _authenticate(); // Trigger PIN or Fingerprint authentication
+      } else {
+        _showSnackBar('Invalid credentials');
+      }
     } catch (e) {
       _showSnackBar('Error: $e');
     } finally {
@@ -90,32 +87,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _navigateToDashboard() async {
-    final response = await ApiService.login(_username, _password);
-    if (response['message'] == 'Login successful') {
-      final userId = response['user_id'];
-      final mobileNumber = response['mobile_number'] ?? '';
-
-      Navigator.pushReplacementNamed(
-        context,
-        '/dashboard',
-        arguments: {
-          'userId': userId,
-          'mobileNumber': mobileNumber,
-        },
-      );
-    } else {
-      _showSnackBar('Invalid credentials');
-    }
-  }
-
+  // Show a snackbar with the provided message
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,82 +106,74 @@ class _LoginScreenState extends State<LoginScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          SingleChildScrollView(
-            child: SafeArea(
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _biometricStatus,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    SizedBox(height: 20),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Username',
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.8),
-                            ),
-                            onChanged: (value) => _username = value,
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter your username'
-                                : null,
+          SafeArea(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
                           ),
-                          SizedBox(height: 20),
-                          TextFormField(
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.8),
-                            ),
-                            onChanged: (value) => _password = value,
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter your password'
-                                : null,
+                          onChanged: (value) => _username = value,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Please enter your username'
+                              : null,
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
                           ),
-                          SizedBox(height: 30),
-                          ElevatedButton(
+                          onChanged: (value) => _password = value,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Please enter your password'
+                              : null,
+                        ),
+                        SizedBox(height: 30),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
                             onPressed: _isLoading ? null : _login,
                             child: _isLoading
                                 ? CircularProgressIndicator()
                                 : Text('Login'),
                           ),
-                          if (_isBiometricAvailable) ...[
-                            SizedBox(height: 20),
-                            ElevatedButton.icon(
-                              onPressed:
-                              _isLoading ? null : _authenticateWithBiometrics,
-                              icon: Icon(Icons.fingerprint),
-                              label: Text('Login with Fingerprint'),
-                            ),
-                          ],
-                          TextButton(
-                            onPressed: () =>
-                                Navigator.pushNamed(context, '/register'),
-                            child: Text(
-                              'Open an account',
-                              style: TextStyle(
-                                  fontSize: 16, color: Colors.blue),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: _isLoading ? null : () {
+                        Navigator.pushNamed(context, '/register');
+                      },
+                      icon: Icon(Icons.app_registration),
+                      label: Text('Register'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -211,5 +181,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
 }

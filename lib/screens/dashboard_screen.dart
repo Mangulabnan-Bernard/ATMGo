@@ -11,7 +11,7 @@ import 'settings_screen.dart';
 class DashboardScreen extends StatefulWidget {
   final int userId;
 
-  DashboardScreen({required this.userId, required String mobileNumber});
+  DashboardScreen({required this.userId});
 
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           'email': data['user']['email'],
           'mobile_number': data['user']['mobile_number'],
           'birthdate': data['user']['birthdate'],
-          'balance': data['card']['balance'] ?? _userData['balance'],
+          'balance': data['card']['balance'] ?? 0.0, // Default to 0.0 if null
           'transactions': data['transactions'] ?? [],
         };
       });
@@ -203,13 +203,8 @@ class HomeTab extends StatelessWidget {
                       style: TextStyle(fontSize: 14, color: Colors.grey)),
                   SizedBox(height: 5),
                   Text(
-                    'PHP ${userData['balance'].toStringAsFixed(2)}',
+                    'PHP ${userData['balance']?.toStringAsFixed(2) ?? '0.00'}',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'Interest Accrued: PHP ${userData['interest_accrued'] ?? 0.0}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),

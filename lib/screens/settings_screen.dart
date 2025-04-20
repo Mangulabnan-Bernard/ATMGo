@@ -19,6 +19,32 @@ class SettingsScreen extends StatelessWidget {
     required this.refreshCardData,
   });
 
+  Future<bool> _showLogoutDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Return false if "No" is pressed
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true if "Yes" is pressed
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +102,13 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               title: Text('Logout'),
-              onTap: () => logout(),
+              onTap: () async {
+                // Show a confirmation dialog first
+                bool confirmLogout = await _showLogoutDialog(context);
+                if (confirmLogout) {
+                  logout();
+                }
+              },
             ),
           ],
         ),

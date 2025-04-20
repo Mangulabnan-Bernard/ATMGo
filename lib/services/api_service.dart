@@ -46,15 +46,29 @@ class ApiService {
   static Future<Map<String, dynamic>> getDashboardData(int userId) async {
     final response = await http.post(
       Uri.parse('$baseUrl/get_dashboard_data.php'),
-      body: jsonEncode({
-        'user_id': userId,
-      }),
+      body: jsonEncode({'user_id': userId}),
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
-      print('Dashboard Data Response: ${response.body}');
-      return jsonDecode(response.body);
+      final data = jsonDecode(response.body);
+      print('Dashboard Data Response: $data'); // Debug log
+
+      // Provide default values if keys are missing
+      return {
+        'user': data['user'] ?? {
+          'user_id': 0,
+          'first_name': 'User',
+          'middle_name': '',
+          'last_name': '',
+          'username': '',
+          'email': '',
+          'mobile_number': '',
+          'birthdate': '',
+        },
+        'card': data['card'] ?? {'balance': 0.0},
+        'transactions': data['transactions'] ?? [],
+      };
     } else {
       throw Exception('Failed to fetch dashboard data');
     }
@@ -213,36 +227,7 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> requestOtp(String email) async {
-    print("Sending OTP to email: $email"); // Ensure this is printing correctly
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/resent_otp.php'),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {'email': email},
-    );
-
-    if (response.statusCode == 200) {
-      print("Response body: ${response.body}"); // Print the response for debugging
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to request OTP');
-    }
-  }
-
-
-  static Future<Map<String, dynamic>> verifyOtpAndChangePassword(
-      String email, String newPassword, String otp) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/verify_otp_and_change_password.php'),
-      body: {
-        'email': email,
-        'otp': otp,
-        'new_password': newPassword,
-      },
-    );
-    return json.decode(response.body);
-  }
   static Future<void> updateUserData(Map<String, dynamic> userData) async {
       try {
         final response = await http.post(
