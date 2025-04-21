@@ -3,7 +3,7 @@ name: Build Android Release AAB
 on:
   push:
     branches:
-      - main  # or your deploy branch
+      - main
   workflow_dispatch:
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: release-aab
           path: build/app/outputs/bundle/release/app-release.aab
