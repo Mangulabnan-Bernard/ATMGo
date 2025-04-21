@@ -127,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text('Version: 1.0.0+11'), // Add version label here
+              title: Text('Version: 1.0.0+12'), // Add version label here
               enabled: false, // Disable the tile to make it non-interactive
             ),
           ],
