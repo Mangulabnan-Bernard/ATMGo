@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import '../services/api_service.dart';
@@ -129,23 +132,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await ApiService.login(_username, _password);
+
       if (response['message'] == 'Login successful') {
         setState(() {
-          _userId = response['user_id']; // Store the user ID
+          _userId = response['user_id'];
         });
-        print('User ID received: $_userId'); // Debug print
-        await _authenticate(); // Trigger PIN or Fingerprint authentication
+        await _authenticate();
       } else {
-        _showSnackBar('Wrong user or password');
+        _showSnackBar('Incorrect username or password.');
       }
+    } on SocketException {
+      _showSnackBar('No internet connection or cannot reach the server.');
+    } on FormatException {
+      _showSnackBar('Bad response from the server.');
+    } on TimeoutException {
+      _showSnackBar('The connection has timed out.');
     } catch (e) {
-      _showSnackBar('Error: $e');
+      _showSnackBar('Something went wrong. Please try again later.');
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
+
 
   // Show a snackbar with the provided message
   void _showSnackBar(String message) {

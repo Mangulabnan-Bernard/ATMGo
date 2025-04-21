@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
       home: SplashScreen(),
       routes: {
         '/register': (context) => RegisterScreen(),
+        '/login': (context) => LoginScreen(),
       },
     );
   }
