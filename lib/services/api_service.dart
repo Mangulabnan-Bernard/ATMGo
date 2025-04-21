@@ -244,5 +244,66 @@ class ApiService {
       print('Exception occurred: $e');
       throw Exception('Failed to update user data: $e');
     }
+  } static Future<Map<String, dynamic>> sendOtp(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/send_otp.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to send OTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to send OTP: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyOtp(String otp) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/verify_otp.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'otp': otp}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to verify OTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to verify OTP: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> resetPassword(
+      String email, // Change from int userId to String email
+      String otp,
+      String newPassword,
+      ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/reset_password.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email, // Use 'email' instead of 'user_id'
+          'otp': otp,
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to reset password: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to reset password: $e');
+    }
   }
 }
+

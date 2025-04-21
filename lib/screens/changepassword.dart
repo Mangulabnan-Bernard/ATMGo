@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'forgot_password_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   final int userId;
@@ -31,7 +32,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password change failed: ${response['message']}')),
+          SnackBar(content: Text('Failed to change password: ${response['message']}')),
         );
       }
     } catch (e) {
@@ -39,6 +40,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     }
+  }
+
+  void _showForgotPasswordModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ForgotPasswordModal();
+      },
+    );
   }
 
   @override
@@ -65,12 +75,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 obscureText: true,
                 validator: (value) => value!.isEmpty ? 'Enter old password' : null,
               ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _newPasswordController,
                 decoration: InputDecoration(labelText: 'New Password'),
                 obscureText: true,
                 validator: (value) => value!.isEmpty ? 'Enter new password' : null,
               ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _confirmPasswordController,
                 decoration: InputDecoration(labelText: 'Confirm New Password'),
@@ -88,6 +100,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ElevatedButton(
                 onPressed: _changePassword,
                 child: Text('Change Password'),
+              ),
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: _showForgotPasswordModal,
+                child: Text('Forgot Password?'),
               ),
             ],
           ),
