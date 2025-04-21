@@ -227,24 +227,22 @@ class ApiService {
     }
   }
 
-
   static Future<void> updateUserData(Map<String, dynamic> userData) async {
-      try {
-        final response = await http.post(
-          Uri.parse('$baseUrl/profile_update.php'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(userData),
-        );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/profile_update.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(userData),
+      );
 
-        if (response.statusCode != 200) {
-          print('Failed to update user data: ${response.statusCode}');
-          throw Exception('Failed to update user data: ${response.statusCode}');
-        }
-
-        print('User data updated successfully');
-      } catch (e) {
-        print('Exception occurred: $e');
-        throw Exception('Failed to update user data: $e');
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update user data: ${response.statusCode}');
       }
+
+      print('User data updated successfully');
+    } catch (e) {
+      print('Exception occurred: $e');
+      throw Exception('Failed to update user data: $e');
     }
+  }
 }

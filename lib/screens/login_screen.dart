@@ -1,73 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import '../services/api_service.dart';
-import 'register_screen.dart'; // Ensure the correct import for RegisterScreen
-import 'dashboard_screen.dart'; // Ensure the correct import for DashboardScreen
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Digital Bank',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: SplashScreen(),
-      routes: {
-        '/register': (context) => RegisterScreen(),
-      },
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _navigateToLogin();
-  }
-
-  _navigateToLogin() async {
-    await Future.delayed(Duration(seconds: 3), () {});
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text(
-              'Welcome to our digital bank',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'register_screen.dart';
+import 'dashboard_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
+
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
@@ -75,46 +17,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final LocalAuthentication auth = LocalAuthentication();
   bool _isLoading = false;
   int? _userId; // Store the user ID
+  final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
+    _retrieveUserId();
   }
 
-  // Authenticate with PIN or Fingerprint
-  Future<void> _authenticate() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      bool authenticated = await auth.authenticate(
-        localizedReason: 'Authenticate to continue',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-        ),
-      );
-
-      if (authenticated) {
-        _showSnackBar('Process successful');
-        // Navigate to the dashboard or perform any other action
-        if (_userId != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DashboardScreen(userId: _userId!),
-            ),
-          );
-        } else {
-          _showSnackBar('User ID not available');
-        }
-      } else {
-        _showSnackBar('Authentication failed');
-      }
-    } catch (e) {
-      _showSnackBar('Authentication failed: $e');
-    } finally {
+  Future<void> _retrieveUserId() async {
+    String? storedUserId = await _secureStorage.read(key: 'user_id');
+    if (storedUserId != null) {
       setState(() {
-        _isLoading = false;
+        _userId = int.parse(storedUserId);
       });
     }
   }
@@ -133,13 +48,56 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _userId = response['user_id']; // Store the user ID
         });
-        print('User ID received: $_userId'); // Debug print
-        await _authenticate(); // Trigger PIN or Fingerprint authentication
+        await _secureStorage.write(key: 'user_id', value: _userId.toString());
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(userId: _userId!),
+          ),
+        );
       } else {
         _showSnackBar('Wrong user or password');
       }
     } catch (e) {
       _showSnackBar('Error: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Authenticate with PIN or Fingerprint
+  Future<void> _authenticateBiometric() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      bool authenticated = await auth.authenticate(
+        localizedReason: 'Authenticate to continue',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated) {
+        if (_userId == null) {
+          _showSnackBar('Please log in First, before using Biometrics.');
+        } else {
+          _showSnackBar('Process successful');
+          // Navigate to the dashboard or perform any other action
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DashboardScreen(userId: _userId!),
+            ),
+          );
+        }
+      } else {
+        _showSnackBar('Authentication failed');
+      }
+    } catch (e) {
+      _showSnackBar('Authentication failed: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -219,6 +177,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _authenticateBiometric,
+                      icon: Icon(Icons.fingerprint),
+                      label: Text('Biometric Login'),
                     ),
                   ),
                   SizedBox(height: 20),
