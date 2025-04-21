@@ -1,5 +1,6 @@
 import 'package:atm_go/screens/privacy.dart';
 import 'package:atm_go/screens/userprofile.dart'; // Import UserProfileScreen
+import 'package:atm_go/screens/favorites.dart'; // Import FavoritesScreen
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import 'about.dart';
@@ -71,6 +72,21 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             ListTile(
+              title: Text('Favorites'), // New Favorites ListTile
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritesScreen(
+                      userId: user.id,
+                      refreshUserData: refreshUserData,
+                      refreshCardData: refreshCardData,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               title: Text('About Us'),
               onTap: () {
                 Navigator.push(
@@ -100,7 +116,6 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
             ),
-
             ListTile(
               title: Text('Logout'),
               onTap: () async {
@@ -110,7 +125,8 @@ class SettingsScreen extends StatelessWidget {
                   logout();
                 }
               },
-            ),ListTile(
+            ),
+            ListTile(
               title: Text('Version: 1.0.0+11'), // Add version label here
               enabled: false, // Disable the tile to make it non-interactive
             ),
