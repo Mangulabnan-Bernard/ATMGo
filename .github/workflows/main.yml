@@ -33,7 +33,7 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Upload AAB artifact
-        uses: actions/upload-artifact@v3  # Use v3 or a more specific version
+        uses: actions/upload-artifact@v3.1.2  # Use a specific version
         with:
           name: release-aab
           path: build/app/outputs/bundle/release/app-release.aab
