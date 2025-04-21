@@ -1,1 +1,39 @@
+name: Build Android Release AAB
 
+on:
+  push:
+    branches:
+      - main  # or your deploy branch
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build AAB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Decode key.properties
+        run: echo "${{ secrets.KEY_PROPERTIES }}" | base64 -d > android/key.properties
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE }}" | base64 -d > android/app/atmgo_keystore.jks
+
+      - name: Build AAB
+        run: flutter build appbundle --release
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
