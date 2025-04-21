@@ -102,12 +102,13 @@ class _CardScreenState extends State<CardScreen> {
                       ),
                     ),
                   ),
+
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 100), // move a bit to the left
+                          padding: const EdgeInsets.fromLTRB(  65,70,4,4), // move a bit to the left
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -129,7 +130,7 @@ class _CardScreenState extends State<CardScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 45),
+                        SizedBox(height: 55),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

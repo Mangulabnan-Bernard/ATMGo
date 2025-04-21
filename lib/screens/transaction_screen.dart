@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'https://atmgo.site/api/';
+  static const String baseUrl = 'https://atmgo.site/api';
 
   // Login
   static Future<Map<String, dynamic>> login(String username, String password) async {
