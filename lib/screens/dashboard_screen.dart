@@ -2,6 +2,7 @@ import 'package:atm_go/screens/userprofile.dart';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
+import 'bills_page.dart';
 import 'card_screen.dart';
 import 'cash_in.dart';
 import 'listbanks.dart';
@@ -276,21 +277,26 @@ class HomeTab extends StatelessWidget {
               _buildActionTile(
                 icon: Icons.send,
                 label: 'Remittance',
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Remittance feature coming soon!')),
+                  );
+                },
               ),
               _buildActionTile(
                 icon: Icons.payment,
                 label: 'Pay Bills',
                 onTap: () {
                   if (userData.containsKey('user_id')) {
-                    Navigator.pushNamed(
+                    Navigator.push(
                       context,
-                      '/pay_bills',
-                      arguments: {
-                        'userId': userData['user_id'],
-                        'refreshUserData': refreshUserData,
-                        'refreshCardData': refreshCardData,
-                      },
+                      MaterialPageRoute(
+                        builder: (context) => PayBillsScreen(
+                          userId: userData['user_id'],
+                          refreshUserData: refreshUserData,
+                          refreshCardData: refreshCardData,
+                        ),
+                      ),
                     );
                   }
                 },
@@ -298,12 +304,20 @@ class HomeTab extends StatelessWidget {
               _buildActionTile(
                 icon: Icons.phone_android,
                 label: 'Buy Load',
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Buy Load feature coming soon!')),
+                  );
+                },
               ),
               _buildActionTile(
                 icon: Icons.more_horiz,
                 label: 'More',
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('More options not available')),
+                  );
+                },
               ),
             ],
           ),

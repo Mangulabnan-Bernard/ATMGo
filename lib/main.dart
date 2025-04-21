@@ -1,3 +1,4 @@
+import 'package:atm_go/screens/billspayment.dart';
 import 'package:atm_go/screens/dashboard_screen.dart';
 import 'package:atm_go/screens/login_screen.dart';
 import 'package:atm_go/screens/register_screen.dart';
@@ -22,6 +23,15 @@ class MyApp extends StatelessWidget {
       routes: {
         '/register': (context) => RegisterScreen(),
         '/login': (context) => LoginScreen(),
+        '/pay_bills': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return PaymentPage(
+            provider: 'Pay Bills', // You can pass the provider name if needed
+            userId: args['userId'],
+            refreshUserData: args['refreshUserData'],
+            refreshCardData: args['refreshCardData'],
+          );
+        },
       },
     );
   }

@@ -72,7 +72,7 @@ class _PaymentPageState extends State<PaymentPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => DashboardScreen(userId: widget.userId,),
+            builder: (context) => DashboardScreen(userId: widget.userId),
           ),
         );
       } else {
