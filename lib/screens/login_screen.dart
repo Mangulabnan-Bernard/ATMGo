@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import 'register_screen.dart';
 import 'dashboard_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'forgot_password_screen.dart'; // Import the ForgotPasswordModal
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -81,7 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (authenticated) {
         if (_userId == null) {
-          _showSnackBar('Please log in First, before using Biometrics.');
+          _showSnackBar('Please log in First, befo'
+              're using Biometrics.');
         } else {
           _showSnackBar('Process successful');
           // Navigate to the dashboard or perform any other action
@@ -111,6 +113,16 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // Show the Forgot Password Modal
+  void _showForgotPasswordModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ForgotPasswordModal();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,7 +143,8 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 20),
+
+                  SizedBox(height: 40),
                   Form(
                     key: _formKey,
                     child: Column(
@@ -139,11 +152,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           decoration: InputDecoration(
                             labelText: 'Username',
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.8),
+                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                           ),
+                          style: TextStyle(color: Colors.black),
                           onChanged: (value) => _username = value,
                           validator: (value) => value == null || value.isEmpty
                               ? 'Please enter your username'
@@ -154,52 +171,75 @@ class _LoginScreenState extends State<LoginScreen> {
                           obscureText: true,
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.8),
+                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                           ),
+                          style: TextStyle(color: Colors.black),
                           onChanged: (value) => _password = value,
                           validator: (value) => value == null || value.isEmpty
                               ? 'Please enter your password'
                               : null,
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _login,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white, backgroundColor: Colors.redAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                             child: _isLoading
-                                ? CircularProgressIndicator()
+                                ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
                                 : Text('Login'),
+                          ),
+                        ), SizedBox(height: 15),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton.icon(
+                            onPressed: _isLoading ? null : () {
+                              Navigator.pushNamed(context, '/register');
+                            },
+                            icon: Icon(Icons.app_registration),
+                            label: Text('Open an Account'),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white, backgroundColor: Colors.redAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        TextButton(
+                          onPressed: _showForgotPasswordModal,
+                          child: Text(
+                            'Forgot Password?',
+                            style: TextStyle(color: Colors.blue.shade900),
                           ),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : _authenticateBiometric,
-                      icon: Icon(Icons.fingerprint),
-                      label: Text('Biometric Login'),
+                  IconButton(
+                    icon: Icon(
+                      Icons.fingerprint,
+                      color: Colors.blue.shade900,
+                      size: 50,
                     ),
+                    onPressed: _isLoading ? null : _authenticateBiometric,
                   ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      icon: Icon(Icons.app_registration),
-                      label: Text('Open an Account'),
-                    ),
-                  ),
+
                 ],
               ),
             ),

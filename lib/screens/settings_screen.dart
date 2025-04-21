@@ -100,6 +100,7 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
             ),
+
             ListTile(
               title: Text('Logout'),
               onTap: () async {
@@ -109,6 +110,9 @@ class SettingsScreen extends StatelessWidget {
                   logout();
                 }
               },
+            ),ListTile(
+              title: Text('Version: 1.0.0+11'), // Add version label here
+              enabled: false, // Disable the tile to make it non-interactive
             ),
           ],
         ),

@@ -24,6 +24,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         int userId = int.parse(response['user_id'].toString());
         final cardResponse = await ApiService.getCardData(userId);
         Navigator.pushReplacementNamed(context, '/login');
+      } else if (response['message'] == 'Email already exists') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: Email already exists')),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration failed: ${response['message']}')),
@@ -35,6 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     }
   }
+
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(

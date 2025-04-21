@@ -52,7 +52,6 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('Dashboard Data Response: $data'); // Debug log
 
       // Provide default values if keys are missing
       return {
